@@ -230,7 +230,11 @@ export default function Home() {
 
               <Button 
                 onClick={handleStopBeep}
-                className="flex-1 bg-app-black hover:bg-gray-800 text-app-white font-semibold py-3 px-6 min-h-[48px] touch-manipulation"
+                className={`flex-1 font-semibold py-3 px-6 min-h-[48px] touch-manipulation ${
+                  isPlaying 
+                    ? 'bg-yellow-500 hover:bg-yellow-600 text-black border-2 border-black animate-pulse' 
+                    : 'bg-gray-400 hover:bg-gray-500 text-white'
+                }`}
                 disabled={!isPlaying}
               >
                 <VolumeX className="mr-2" size={20} />
