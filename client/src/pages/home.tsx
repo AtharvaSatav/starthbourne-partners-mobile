@@ -162,10 +162,10 @@ export default function Home() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <Satellite className="text-2xl w-8 h-8" />
+              <Satellite className="text-white w-8 h-8" />
               <div>
-                <h1 className="text-xl font-bold">Starthbourne Partners</h1>
-                <p className="text-sm text-app-gray">Monitoring Dashboard</p>
+                <h1 className="text-xl font-bold text-white">Starthbourne Partners</h1>
+                <p className="text-sm text-gray-300">Monitoring Dashboard</p>
               </div>
             </div>
             <div className="flex items-center space-x-2">
