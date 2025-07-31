@@ -1,0 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(0, 0%, 0%);
+  --muted: hsl(0, 0%, 97%);
+  --muted-foreground: hsl(0, 0%, 42%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(0, 0%, 0%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(0, 0%, 0%);
+  --border: hsl(0, 0%, 90%);
+  --input: hsl(0, 0%, 90%);
+  --primary: hsl(0, 0%, 0%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(0, 0%, 97%);
+  --secondary-foreground: hsl(0, 0%, 6%);
+  --accent: hsl(0, 0%, 97%);
+  --accent-foreground: hsl(0, 0%, 6%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --success: hsl(120, 84%, 40%);
+  --success-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(0, 0%, 4%);
+  --radius: 0.5rem;
+  
+  /* App-specific colors */
+  --app-black: hsl(0, 0%, 0%);
+  --app-white: hsl(0, 0%, 100%);
+  --app-gray: hsl(210, 8%, 42%);
+  --app-light-gray: hsl(210, 17%, 98%);
+  --app-red: hsl(354, 70%, 54%);
+  --app-green: hsl(142, 71%, 45%);
+}
+
+.dark {
+  --background: hsl(0, 0%, 4%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(0, 0%, 15%);
+  --muted-foreground: hsl(0, 0%, 64%);
+  --popover: hsl(0, 0%, 4%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(0, 0%, 4%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(0, 0%, 15%);
+  --input: hsl(0, 0%, 15%);
+  --primary: hsl(0, 0%, 98%);
+  --primary-foreground: hsl(0, 0%, 9%);
+  --secondary: hsl(0, 0%, 15%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(0, 0%, 15%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 63%, 31%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(0, 0%, 84%);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+}
+
+@layer utilities {
+  .app-black {
+    color: var(--app-black);
+  }
+  
+  .bg-app-black {
+    background-color: var(--app-black);
+  }
+  
+  .app-white {
+    color: var(--app-white);
+  }
+  
+  .bg-app-white {
+    background-color: var(--app-white);
+  }
+  
+  .app-gray {
+    color: var(--app-gray);
+  }
+  
+  .bg-app-gray {
+    background-color: var(--app-gray);
+  }
+  
+  .bg-app-light-gray {
+    background-color: var(--app-light-gray);
+  }
+  
+  .app-red {
+    color: var(--app-red);
+  }
+  
+  .bg-app-red {
+    background-color: var(--app-red);
+  }
+  
+  .app-green {
+    color: var(--app-green);
+  }
+  
+  .bg-app-green {
+    background-color: var(--app-green);
+  }
+  
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+}
+
+@layer components {
+  .log-entry-beep {
+    @apply border-l-4 border-red-500 bg-red-50 hover:bg-red-100;
+  }
+  
+  .log-entry-silent {
+    @apply border-l-4 border-green-500 bg-green-50 hover:bg-green-100;
+  }
+}
