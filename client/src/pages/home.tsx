@@ -32,7 +32,7 @@ export default function Home() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { isConnected, lastMessage, sendKillSwitch } = useWebSocket();
-  const { isPlaying, playBeep, stopBeep } = useAudio();
+  const { isPlaying, playBeep, stopBeep, startContinuousBeep } = useAudio();
 
   // Fetch current logs
   const { data: logsData, isLoading } = useQuery<LogsResponse>({
@@ -70,9 +70,9 @@ export default function Home() {
         // Invalidate queries to fetch new logs
         queryClient.invalidateQueries({ queryKey: ["/api/logs"] });
         
-        // Play beep if it's a beep type log
+        // Start continuous beep if it's a beep type log
         if (lastMessage.data?.beepType === "beep") {
-          playBeep();
+          startContinuousBeep();
         }
         break;
         
@@ -92,7 +92,7 @@ export default function Home() {
         });
         break;
     }
-  }, [lastMessage, queryClient, playBeep, toast]);
+  }, [lastMessage, queryClient, startContinuousBeep, toast]);
 
   const handleKillSwitch = async () => {
     const success = sendKillSwitch();
