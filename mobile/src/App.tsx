@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import HomeScreen from './screens/HomeScreen';
 import {FirstTimeSetupScreen} from './screens/FirstTimeSetupScreen';
 import {NotificationProvider} from './hooks/useNotifications';
+import {DailyCleanupScheduler} from './services/dailyCleanupScheduler';
 
 const Stack = createNativeStackNavigator();
 const queryClient = new QueryClient({
@@ -25,6 +26,9 @@ const App = () => {
 
   useEffect(() => {
     checkFirstTimeSetup();
+    
+    // Schedule daily cleanup when app starts
+    DailyCleanupScheduler.scheduleDaily6PMCleanup();
   }, []);
 
   const checkFirstTimeSetup = async () => {

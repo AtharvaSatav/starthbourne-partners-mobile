@@ -58,6 +58,7 @@ Preferred communication style: Simple, everyday language.
 - **Critical Alert System**: Full-screen notifications that wake phone like alarms
 - **Automatic Permission Setup**: First-time wizard guides users through required permissions
 - **24/7 Monitoring**: Works even when screen is off or in Do Not Disturb mode
+- **Background Daily Cleanup**: Automatic log archival at 6 PM even when app is closed
 
 ## Data Flow
 

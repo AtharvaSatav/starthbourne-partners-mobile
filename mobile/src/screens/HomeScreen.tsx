@@ -19,6 +19,7 @@ import {useNotifications} from '../hooks/useNotifications';
 import {useAlarmNotification} from '../hooks/useAlarmNotification';
 import {usePermissionManager} from '../hooks/usePermissionManager';
 import {PermissionSetupWizard} from '../components/PermissionSetupWizard';
+import {useBackgroundCleanup} from '../hooks/useBackgroundCleanup';
 import {Log} from '../types/Log';
 
 const {width} = Dimensions.get('window');
@@ -48,6 +49,12 @@ const HomeScreen = () => {
     openAppSettings,
     getPermissionGuide,
   } = usePermissionManager();
+  
+  const {
+    isCleanupAvailable,
+    getCleanupInfo,
+    forceCleanup,
+  } = useBackgroundCleanup();
 
   const {data: logsData, isLoading, refetch} = useQuery({
     queryKey: ['/api/logs'],
@@ -304,6 +311,18 @@ const HomeScreen = () => {
         </View>
       )}
 
+      {/* Daily Cleanup Status */}
+      {permissionStatus.allGranted && (
+        <View style={styles.cleanupStatusContainer}>
+          <Text style={styles.cleanupStatusTitle}>🗂️ Daily Cleanup Status</Text>
+          <CleanupStatusDisplay 
+            getCleanupInfo={getCleanupInfo}
+            isCleanupAvailable={isCleanupAvailable}
+            onForceCleanup={forceCleanup}
+          />
+        </View>
+      )}
+
       {/* Action Buttons */}
       <View style={styles.buttonContainer}>
         {(isPlaying || isAlarmActive) && (
@@ -361,6 +380,58 @@ const HomeScreen = () => {
         onComplete={handlePermissionSetupComplete}
       />
     </SafeAreaView>
+  );
+};
+
+const CleanupStatusDisplay = ({ getCleanupInfo, isCleanupAvailable, onForceCleanup }) => {
+  const cleanupInfo = getCleanupInfo();
+  
+  const handleForceCleanup = async () => {
+    Alert.alert(
+      'Force Cleanup',
+      'This will archive all logs from today and clear the home screen. Continue?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Archive Logs', 
+          onPress: async () => {
+            const success = await onForceCleanup();
+            if (success) {
+              Alert.alert('Success', 'Logs have been archived and home screen cleared.');
+            } else {
+              Alert.alert('Error', 'Failed to archive logs. Please try again.');
+            }
+          }
+        },
+      ]
+    );
+  };
+
+  return (
+    <View style={styles.cleanupDisplay}>
+      <View style={styles.cleanupInfo}>
+        <Text style={styles.cleanupInfoText}>
+          Next cleanup: {cleanupInfo.nextCleanupTime.toLocaleString()}
+        </Text>
+        {cleanupInfo.lastCleanup && (
+          <Text style={styles.cleanupInfoText}>
+            Last cleanup: {cleanupInfo.lastCleanup.toLocaleString()}
+          </Text>
+        )}
+        <Text style={styles.cleanupDescription}>
+          At 6 PM daily, logs are automatically archived even when app is closed
+        </Text>
+      </View>
+      
+      {isCleanupAvailable && (
+        <TouchableOpacity 
+          style={styles.cleanupButton}
+          onPress={handleForceCleanup}
+        >
+          <Text style={styles.cleanupButtonText}>Archive Now</Text>
+        </TouchableOpacity>
+      )}
+    </View>
   );
 };
 
@@ -599,6 +670,47 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     textAlign: 'center',
+  },
+  cleanupStatusContainer: {
+    backgroundColor: '#1f2937',
+    margin: 20,
+    padding: 20,
+    borderRadius: 12,
+  },
+  cleanupStatusTitle: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  cleanupDisplay: {
+    gap: 12,
+  },
+  cleanupInfo: {
+    gap: 6,
+  },
+  cleanupInfoText: {
+    color: '#e5e7eb',
+    fontSize: 14,
+  },
+  cleanupDescription: {
+    color: '#9ca3af',
+    fontSize: 12,
+    fontStyle: 'italic',
+    marginTop: 4,
+  },
+  cleanupButton: {
+    backgroundColor: '#6b7280',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 6,
+    alignSelf: 'flex-start',
+  },
+  cleanupButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
 
