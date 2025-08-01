@@ -91,6 +91,14 @@ export default function Home() {
           description: `${lastMessage.data?.count || 0} logs archived at 6 PM.`,
         });
         break;
+        
+      case "LOGS_ARCHIVED_AND_CLEARED":
+        queryClient.invalidateQueries({ queryKey: ["/api/logs"] });
+        toast({
+          title: "Daily cleanup completed",
+          description: `${lastMessage.data?.count || 0} logs archived and home screen cleared for new day.`,
+        });
+        break;
     }
   }, [lastMessage, queryClient, startContinuousBeep, toast]);
 

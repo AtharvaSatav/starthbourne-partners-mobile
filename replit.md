@@ -52,8 +52,9 @@ Preferred communication style: Simple, everyday language.
 1. **Log Creation**: External systems POST to `/api/logs` endpoint
 2. **Real-time Broadcasting**: WebSocket server broadcasts new logs to connected clients
 3. **Client Updates**: Frontend receives WebSocket messages and updates UI
-4. **Audio Notifications**: Client plays beep sounds based on log beep type
+4. **Audio Notifications**: Client plays continuous beep sounds for "beep" type logs until stopped
 5. **Data Persistence**: All logs stored in PostgreSQL with archival system
+6. **Daily Cleanup**: At 6 PM daily, logs are archived to database and cleared from home screen
 
 ## External Dependencies
 

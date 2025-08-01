@@ -116,9 +116,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const archivedCount = await storage.archiveOldLogs();
       console.log(`Archived ${archivedCount} logs`);
       
-      // Broadcast archive notification to all WebSocket clients
+      // Broadcast archive notification and clear logs from home screen
       const archiveMessage = JSON.stringify({ 
-        type: 'LOGS_ARCHIVED', 
+        type: 'LOGS_ARCHIVED_AND_CLEARED', 
         data: { count: archivedCount, timestamp: new Date().toISOString() }
       });
       wsConnections.forEach((client) => {
