@@ -16,6 +16,7 @@ import {api} from '../utils/api';
 import {useWebSocket} from '../hooks/useWebSocket';
 import {useAudio} from '../hooks/useAudio';
 import {useNotifications} from '../hooks/useNotifications';
+import {useAlarmNotification} from '../hooks/useAlarmNotification';
 import {Log} from '../types/Log';
 
 const {width} = Dimensions.get('window');
@@ -26,6 +27,14 @@ const HomeScreen = () => {
   const {isConnected, lastMessage, sendKillSwitch} = useWebSocket();
   const {isPlaying, startContinuousBeep, stopBeep} = useAudio();
   const {sendNotification} = useNotifications();
+  const {
+    isAlarmActive,
+    hasPermissions,
+    startContinuousAlarm,
+    stopAlarm,
+    createFullScreenNotification,
+    requestPermissions,
+  } = useAlarmNotification();
 
   const {data: logsData, isLoading, refetch} = useQuery({
     queryKey: ['/api/logs'],
@@ -52,20 +61,27 @@ const HomeScreen = () => {
           `${newLog.source}: ${newLog.message}`
         );
         
-        // Start beeping if needed
-        if (newLog.beepType === 'beep' && !isPlaying) {
-          startContinuousBeep();
+        // For beep logs, use alarm system for critical alerts
+        if (newLog.beepType === 'beep') {
+          if (!isPlaying && !isAlarmActive) {
+            // Start both audio beeping and alarm system
+            startContinuousBeep();
+            startContinuousAlarm(newLog.message, newLog.source || 'System');
+            createFullScreenNotification(newLog.message, newLog.source || 'System');
+          }
         }
         break;
 
       case 'LOGS_CLEARED':
         queryClient.invalidateQueries({queryKey: ['/api/logs']});
         stopBeep();
+        stopAlarm();
         break;
 
       case 'LOGS_ARCHIVED_AND_CLEARED':
         queryClient.invalidateQueries({queryKey: ['/api/logs']});
         stopBeep();
+        stopAlarm();
         sendNotification(
           'Daily Cleanup',
           `${lastMessage.data?.count || 0} logs archived and home screen cleared`
@@ -74,14 +90,19 @@ const HomeScreen = () => {
     }
   }, [lastMessage, queryClient, sendNotification, startContinuousBeep, stopBeep, isPlaying]);
 
-  // Auto-start beeping if there are beeping logs
+  // Auto-start beeping and alarms if there are beeping logs
   useEffect(() => {
-    if (beepingLogs.length > 0 && !isPlaying) {
+    if (beepingLogs.length > 0 && !isPlaying && !isAlarmActive) {
       startContinuousBeep();
-    } else if (beepingLogs.length === 0 && isPlaying) {
+      if (beepingLogs.length > 0) {
+        const latestBeepLog = beepingLogs[0];
+        startContinuousAlarm(latestBeepLog.message, latestBeepLog.source || 'System');
+      }
+    } else if (beepingLogs.length === 0 && (isPlaying || isAlarmActive)) {
       stopBeep();
+      stopAlarm();
     }
-  }, [beepingLogs.length, isPlaying, startContinuousBeep, stopBeep]);
+  }, [beepingLogs.length, isPlaying, isAlarmActive, startContinuousBeep, stopBeep, startContinuousAlarm, stopAlarm, beepingLogs]);
 
   // Handle app state changes for background notifications
   useEffect(() => {
@@ -127,6 +148,7 @@ const HomeScreen = () => {
 
   const handleStopBeeping = () => {
     stopBeep();
+    stopAlarm();
   };
 
   const handleKillSwitch = () => {
@@ -201,14 +223,26 @@ const HomeScreen = () => {
         </View>
       </View>
 
+      {/* Permissions Warning */}
+      {!hasPermissions && (
+        <View style={styles.warningContainer}>
+          <Text style={styles.warningText}>⚠️ Alarm permissions needed for critical alerts</Text>
+          <TouchableOpacity style={styles.permissionButton} onPress={requestPermissions}>
+            <Text style={styles.permissionButtonText}>Grant Permissions</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       {/* Action Buttons */}
       <View style={styles.buttonContainer}>
-        {isPlaying && (
+        {(isPlaying || isAlarmActive) && (
           <TouchableOpacity 
             style={[styles.button, styles.stopButton]} 
             onPress={handleStopBeeping}
           >
-            <Text style={styles.buttonText}>Stop Beeping</Text>
+            <Text style={styles.buttonText}>
+              {isAlarmActive ? 'Stop Urgent Alert' : 'Stop Beeping'}
+            </Text>
           </TouchableOpacity>
         )}
         
@@ -394,6 +428,30 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 10,
     fontWeight: 'bold',
+  },
+  warningContainer: {
+    backgroundColor: '#dc2626',
+    margin: 20,
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  warningText: {
+    color: '#ffffff',
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  permissionButton: {
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 6,
+  },
+  permissionButtonText: {
+    color: '#dc2626',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
 });
 

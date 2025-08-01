@@ -110,6 +110,13 @@ Your React Native app is now ready! All the functionality from your web app has 
 - **Mobile app:** Native audio system integration
 - **Benefit:** Reliable beeping alerts
 
+### 🚨 Critical Alert System (NEW)
+- **Full-screen notifications:** Like incoming phone calls
+- **Screen wake capability:** Turns phone on when screen is off
+- **Continuous alarms:** Beeps until manually stopped
+- **Bypass Do Not Disturb:** Critical logs break through all restrictions
+- **Wake lock technology:** Keeps phone responsive during alerts
+
 ### 📱 Native Experience
 - **Web app:** Feels like a website
 - **Mobile app:** True native app experience
@@ -128,8 +135,18 @@ Before distributing, test these features:
 - [ ] **WebSocket:** Real-time updates work
 - [ ] **Push Notifications:** Receive notifications when app is closed
 - [ ] **Audio Alerts:** Beeping works for "beep" type logs
+- [ ] **Critical Alerts:** Full-screen alerts wake phone when screen is off
+- [ ] **Alarm System:** Continuous beeping until manually stopped
+- [ ] **Screen Wake:** Phone turns on and shows alert immediately
 - [ ] **Kill Switch:** Successfully sends stop signals
 - [ ] **Daily Archival:** Shows cleanup notifications at 6 PM
+- [ ] **Permissions:** App requests and uses alarm/wake permissions
+
+**Critical Alert Test:**
+1. Lock phone and wait 30 seconds
+2. Send beep log via API
+3. Phone should: turn on screen, show full-screen alert, beep continuously
+4. Alert should persist until "Stop Urgent Alert" is tapped
 
 ## Distribution Recommendations
 
