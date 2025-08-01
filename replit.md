@@ -4,6 +4,8 @@
 
 This is a full-stack web application built with React frontend and Express backend, designed as a logging system with real-time WebSocket communication. The application uses a modern tech stack including TypeScript, Tailwind CSS with shadcn/ui components, PostgreSQL with Drizzle ORM, and Neon as the database provider.
 
+**NEW: Native Mobile App** - A React Native mobile application is now available in the `/mobile` directory, providing the same functionality with additional native features like background push notifications and better audio handling.
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
@@ -46,6 +48,13 @@ Preferred communication style: Simple, everyday language.
 - **Responsive Design**: Mobile-first approach with Tailwind breakpoints
 - **Toast Notifications**: User feedback system
 - **Component Library**: Comprehensive UI components from shadcn/ui
+
+### Mobile App Features (NEW)
+- **Native Push Notifications**: Background alerts even when app is closed
+- **React Native Audio**: Superior audio handling with native sound system
+- **Cross-Platform**: Single codebase for iOS and Android
+- **Background Processing**: Maintains WebSocket connection in background
+- **App Store Distribution**: Installable via Google Play and Apple App Store
 
 ## Data Flow
 
@@ -98,3 +107,21 @@ Preferred communication style: Simple, everyday language.
 - Drizzle configured for PostgreSQL with migrations directory
 
 The application follows a clean separation of concerns with shared schemas between frontend and backend, ensuring type safety across the full stack. The real-time logging system is designed for monitoring and notification purposes with both visual and audio feedback mechanisms.
+
+## Mobile App Architecture
+
+### React Native Implementation
+- **Framework**: React Native 0.73 with TypeScript
+- **Navigation**: React Navigation v6 for screen management
+- **State Management**: TanStack Query for server state consistency
+- **Push Notifications**: React Native Push Notification for background alerts
+- **Audio System**: React Native Sound for native audio handling
+- **WebSocket**: Native WebSocket implementation with auto-reconnection
+
+### Deployment Options
+- **Development**: Metro bundler with hot reloading
+- **Production**: Native APK/IPA builds for distribution
+- **Distribution**: Direct APK sharing, TestFlight, or app store publication
+- **API Integration**: Connects to same Replit backend endpoints
+
+The mobile app maintains 100% feature parity with the web version while providing native mobile capabilities like background notifications, better audio handling, and app store distribution.
