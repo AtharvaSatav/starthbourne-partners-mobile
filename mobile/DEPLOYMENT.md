@@ -155,6 +155,14 @@ Before distributing, test these features:
 4. Verify all critical permissions are granted
 5. Test critical alerts work after setup
 
+**Background Notification Test:**
+1. Close the app completely (not just minimize)
+2. Wait 2-3 minutes for background service to activate
+3. Send API request to create new log
+4. Should receive push notification within 2 minutes
+5. For beep logs: Should get persistent critical alert with repeating reminders
+6. Tap notification to acknowledge and stop reminders
+
 ## Distribution Recommendations
 
 ### For Internal Team Use

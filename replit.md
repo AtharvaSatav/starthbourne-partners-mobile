@@ -59,6 +59,8 @@ Preferred communication style: Simple, everyday language.
 - **Automatic Permission Setup**: First-time wizard guides users through required permissions
 - **24/7 Monitoring**: Works even when screen is off or in Do Not Disturb mode
 - **Background Daily Cleanup**: Automatic log archival at 6 PM even when app is closed
+- **Background Notification Service**: Receives API notifications via periodic polling when app is closed
+- **Critical Alert Persistence**: Repeating reminders every 30 seconds until acknowledged
 
 ## Data Flow
 

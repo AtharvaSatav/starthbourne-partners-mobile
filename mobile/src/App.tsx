@@ -9,6 +9,8 @@ import HomeScreen from './screens/HomeScreen';
 import {FirstTimeSetupScreen} from './screens/FirstTimeSetupScreen';
 import {NotificationProvider} from './hooks/useNotifications';
 import {DailyCleanupScheduler} from './services/dailyCleanupScheduler';
+import {backgroundNotificationService} from './services/backgroundNotificationService';
+import {PushNotificationHandler} from './services/pushNotificationHandler';
 
 const Stack = createNativeStackNavigator();
 const queryClient = new QueryClient({
@@ -27,8 +29,11 @@ const App = () => {
   useEffect(() => {
     checkFirstTimeSetup();
     
-    // Schedule daily cleanup when app starts
+    // Initialize background services when app starts
     DailyCleanupScheduler.scheduleDaily6PMCleanup();
+    backgroundNotificationService.initializeBackgroundService();
+    backgroundNotificationService.schedulePeriodicChecks();
+    PushNotificationHandler.initialize();
   }, []);
 
   const checkFirstTimeSetup = async () => {
