@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {StatusBar, StyleSheet} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import HomeScreen from './screens/HomeScreen';
+import {FirstTimeSetupScreen} from './screens/FirstTimeSetupScreen';
 import {NotificationProvider} from './hooks/useNotifications';
 
 const Stack = createNativeStackNavigator();
@@ -18,6 +20,33 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
+  const [showFirstTimeSetup, setShowFirstTimeSetup] = useState(false);
+  const [isCheckingSetup, setIsCheckingSetup] = useState(true);
+
+  useEffect(() => {
+    checkFirstTimeSetup();
+  }, []);
+
+  const checkFirstTimeSetup = async () => {
+    try {
+      const hasCompletedSetup = await AsyncStorage.getItem('hasCompletedFirstTimeSetup');
+      setShowFirstTimeSetup(hasCompletedSetup !== 'true');
+    } catch (error) {
+      console.error('Error checking first time setup:', error);
+      setShowFirstTimeSetup(true); // Show setup on error to be safe
+    } finally {
+      setIsCheckingSetup(false);
+    }
+  };
+
+  const handleSetupComplete = () => {
+    setShowFirstTimeSetup(false);
+  };
+
+  if (isCheckingSetup) {
+    return null; // Or a loading screen
+  }
+
   return (
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
@@ -35,14 +64,23 @@ const App = () => {
                   fontSize: 18,
                 },
               }}>
-              <Stack.Screen
-                name="Home"
-                component={HomeScreen}
-                options={{
-                  title: 'Starthbourne Partners',
-                  headerTitleAlign: 'center',
-                }}
-              />
+              {showFirstTimeSetup ? (
+                <Stack.Screen
+                  name="FirstTimeSetup"
+                  options={{ headerShown: false }}
+                >
+                  {() => <FirstTimeSetupScreen onComplete={handleSetupComplete} />}
+                </Stack.Screen>
+              ) : (
+                <Stack.Screen
+                  name="Home"
+                  component={HomeScreen}
+                  options={{
+                    title: 'Starthbourne Partners',
+                    headerTitleAlign: 'center',
+                  }}
+                />
+              )}
             </Stack.Navigator>
           </NavigationContainer>
         </NotificationProvider>

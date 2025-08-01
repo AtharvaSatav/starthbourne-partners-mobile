@@ -148,6 +148,13 @@ Before distributing, test these features:
 3. Phone should: turn on screen, show full-screen alert, beep continuously
 4. Alert should persist until "Stop Urgent Alert" is tapped
 
+**First-Time Setup Test:**
+1. Install fresh APK on device
+2. App should automatically show setup wizard
+3. Follow permission setup process
+4. Verify all critical permissions are granted
+5. Test critical alerts work after setup
+
 ## Distribution Recommendations
 
 ### For Internal Team Use

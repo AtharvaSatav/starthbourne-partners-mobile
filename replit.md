@@ -55,6 +55,9 @@ Preferred communication style: Simple, everyday language.
 - **Cross-Platform**: Single codebase for iOS and Android
 - **Background Processing**: Maintains WebSocket connection in background
 - **App Store Distribution**: Installable via Google Play and Apple App Store
+- **Critical Alert System**: Full-screen notifications that wake phone like alarms
+- **Automatic Permission Setup**: First-time wizard guides users through required permissions
+- **24/7 Monitoring**: Works even when screen is off or in Do Not Disturb mode
 
 ## Data Flow
 

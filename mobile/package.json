@@ -23,6 +23,7 @@
     "react-native-alarm-notification": "^1.8.1",
     "react-native-wake-lock": "^2.0.0",
     "react-native-system-alert-window": "^2.0.0",
+    "react-native-permissions": "^4.1.5",
     "@react-navigation/native": "^6.1.0",
     "@react-navigation/native-stack": "^6.9.0",
     "react-native-screens": "^3.25.0",

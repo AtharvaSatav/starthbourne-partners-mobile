@@ -17,12 +17,15 @@ import {useWebSocket} from '../hooks/useWebSocket';
 import {useAudio} from '../hooks/useAudio';
 import {useNotifications} from '../hooks/useNotifications';
 import {useAlarmNotification} from '../hooks/useAlarmNotification';
+import {usePermissionManager} from '../hooks/usePermissionManager';
+import {PermissionSetupWizard} from '../components/PermissionSetupWizard';
 import {Log} from '../types/Log';
 
 const {width} = Dimensions.get('window');
 
 const HomeScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
+  const [showPermissionWizard, setShowPermissionWizard] = useState(false);
   const queryClient = useQueryClient();
   const {isConnected, lastMessage, sendKillSwitch} = useWebSocket();
   const {isPlaying, startContinuousBeep, stopBeep} = useAudio();
@@ -35,6 +38,16 @@ const HomeScreen = () => {
     createFullScreenNotification,
     requestPermissions,
   } = useAlarmNotification();
+  
+  const {
+    permissionStatus,
+    isRequestingPermissions,
+    currentStep,
+    requestAllPermissions,
+    checkAllPermissions,
+    openAppSettings,
+    getPermissionGuide,
+  } = usePermissionManager();
 
   const {data: logsData, isLoading, refetch} = useQuery({
     queryKey: ['/api/logs'],
@@ -151,6 +164,22 @@ const HomeScreen = () => {
     stopAlarm();
   };
 
+  const handlePermissionSetupComplete = () => {
+    setShowPermissionWizard(false);
+    checkAllPermissions();
+  };
+
+  // Show permission wizard on first launch if permissions are missing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!permissionStatus.allGranted && !showPermissionWizard) {
+        setShowPermissionWizard(true);
+      }
+    }, 2000); // Wait 2 seconds after app load
+
+    return () => clearTimeout(timer);
+  }, [permissionStatus.allGranted, showPermissionWizard]);
+
   const handleKillSwitch = () => {
     Alert.alert(
       'Kill Switch',
@@ -223,13 +252,55 @@ const HomeScreen = () => {
         </View>
       </View>
 
-      {/* Permissions Warning */}
-      {!hasPermissions && (
-        <View style={styles.warningContainer}>
-          <Text style={styles.warningText}>⚠️ Alarm permissions needed for critical alerts</Text>
-          <TouchableOpacity style={styles.permissionButton} onPress={requestPermissions}>
-            <Text style={styles.permissionButtonText}>Grant Permissions</Text>
-          </TouchableOpacity>
+      {/* Permissions Setup */}
+      {!permissionStatus.allGranted && (
+        <View style={styles.permissionSetupContainer}>
+          <View style={styles.permissionHeader}>
+            <Text style={styles.permissionTitle}>🚨 Critical Alert Setup Required</Text>
+            <Text style={styles.permissionSubtitle}>
+              For alerts to work when your screen is off, we need to set up special permissions
+            </Text>
+          </View>
+          
+          {isRequestingPermissions && (
+            <View style={styles.progressContainer}>
+              <Text style={styles.progressText}>
+                Step {currentStep + 1} of 5: Setting up permissions...
+              </Text>
+            </View>
+          )}
+          
+          <View style={styles.permissionList}>
+            {getPermissionGuide().map((permission, index) => (
+              <Text key={index} style={styles.permissionItem}>{permission}</Text>
+            ))}
+          </View>
+          
+          <View style={styles.permissionButtons}>
+            <TouchableOpacity 
+              style={[styles.button, styles.setupButton]}
+              onPress={() => setShowPermissionWizard(true)}
+              disabled={isRequestingPermissions}
+            >
+              <Text style={styles.buttonText}>
+                {isRequestingPermissions ? 'Setting up...' : 'Setup Wizard'}
+              </Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.button, styles.manualButton]}
+              onPress={openAppSettings}
+            >
+              <Text style={styles.buttonText}>Manual Setup</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+      
+      {/* Quick Status for Granted Permissions */}
+      {permissionStatus.allGranted && (
+        <View style={styles.permissionSuccessContainer}>
+          <Text style={styles.permissionSuccessText}>✅ Critical alerts ready - works when screen is off</Text>
         </View>
       )}
 
@@ -283,6 +354,12 @@ const HomeScreen = () => {
           activeLogs.map((log) => <LogItem key={log.id} log={log} />)
         )}
       </ScrollView>
+
+      <PermissionSetupWizard
+        visible={showPermissionWizard}
+        onClose={() => setShowPermissionWizard(false)}
+        onComplete={handlePermissionSetupComplete}
+      />
     </SafeAreaView>
   );
 };
@@ -452,6 +529,76 @@ const styles = StyleSheet.create({
     color: '#dc2626',
     fontWeight: 'bold',
     fontSize: 14,
+  },
+  permissionSetupContainer: {
+    backgroundColor: '#1f2937',
+    margin: 20,
+    padding: 20,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#dc2626',
+  },
+  permissionHeader: {
+    marginBottom: 15,
+  },
+  permissionTitle: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  permissionSubtitle: {
+    color: '#d1d5db',
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  progressContainer: {
+    backgroundColor: '#374151',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 15,
+  },
+  progressText: {
+    color: '#f59e0b',
+    fontSize: 14,
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+  permissionList: {
+    marginBottom: 20,
+  },
+  permissionItem: {
+    color: '#e5e7eb',
+    fontSize: 14,
+    marginBottom: 8,
+    lineHeight: 20,
+  },
+  permissionButtons: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  setupButton: {
+    backgroundColor: '#dc2626',
+    flex: 1,
+  },
+  manualButton: {
+    backgroundColor: '#6b7280',
+    flex: 1,
+  },
+  permissionSuccessContainer: {
+    backgroundColor: '#065f46',
+    margin: 20,
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  permissionSuccessText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '500',
+    textAlign: 'center',
   },
 });
 
