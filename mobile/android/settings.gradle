@@ -1,2 +1,15 @@
 rootProject.name = 'BeepStreamMobile'
 include ':app'
+
+// Apply React Native settings only if CLI exists
+def reactNativeCliPath = "../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"
+if (file(reactNativeCliPath).exists()) {
+    apply from: reactNativeCliPath
+    applyNativeModulesSettingsGradle(settings)
+}
+
+// Include React Native Gradle plugin only if it exists
+def reactNativeGradlePluginPath = "../node_modules/@react-native/gradle-plugin"
+if (file(reactNativeGradlePluginPath).exists()) {
+    includeBuild(reactNativeGradlePluginPath)
+}

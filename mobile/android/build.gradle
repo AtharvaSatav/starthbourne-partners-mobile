@@ -15,7 +15,14 @@ buildscript {
     }
     dependencies {
         classpath("com.android.tools.build:gradle:8.1.0")
-        // Note: Do not include React Native Gradle plugin here to avoid path dependencies
+        
+        // Only include React Native Gradle plugin if it exists
+        def reactNativeGradlePlugin = "../node_modules/@react-native/gradle-plugin"
+        if (file(reactNativeGradlePlugin).exists()) {
+            classpath("com.facebook.react:react-native-gradle-plugin")
+        }
+        
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
     }
 }
 
@@ -24,6 +31,7 @@ allprojects {
         google()
         mavenCentral()
         maven { url "https://www.jitpack.io" }
+        
         // Add React Native repository only if available
         def reactNativeAndroidPath = "$rootDir/../node_modules/react-native/android"
         if (file(reactNativeAndroidPath).exists()) {
