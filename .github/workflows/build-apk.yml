@@ -7,6 +7,10 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+  actions: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -84,25 +88,27 @@ jobs:
         retention-days: 30
 
     - name: Create Release
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
       uses: softprops/action-gh-release@v1
       with:
         tag_name: v${{ github.run_number }}
         name: BeepStream Mobile v${{ github.run_number }}
         body: |
-          Automated build of BeepStream mobile app.
+          Automated build of BeepStream mobile app (unsigned APK).
           
           ## Installation Instructions
           1. Download the APK file below
           2. Enable "Unknown sources" in Android settings
           3. Install the APK on your phone
+          4. Grant notification and audio permissions when prompted
           
           ## Features
-          - Real-time log monitoring
-          - Background notifications
-          - Audio alerts for critical logs
-          - Kill switch functionality
+          - Real-time log monitoring with WebSocket connection
+          - Background notifications for critical alerts
+          - Audio alerts with native alarm sounds
+          - Kill switch functionality via WebView bridge
           - Daily archival integration
+          - Hybrid native/web architecture
         files: mobile/android/app/build/outputs/apk/release/*.apk
         draft: false
         prerelease: false
