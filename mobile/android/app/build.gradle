@@ -81,8 +81,6 @@ dependencies {
     
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
     
-    // Flipper removed for React Native 0.73+
-    
     if (enableHermes) {
         //noinspection GradleDynamicVersion
         implementation("com.facebook.react:hermes-engine:+") { // From node_modules

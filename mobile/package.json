@@ -1,5 +1,5 @@
 {
-  "name": "starthbourne-partners-mobile",
+  "name": "beepstream-mobile",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,7 @@
     "test": "jest",
     "lint": "eslint .",
     "build:android": "cd android && ./gradlew assembleRelease",
-    "build:ios": "cd ios && xcodebuild -workspace StarthbournePartners.xcworkspace -scheme StarthbournePartners -configuration Release -destination generic/platform=iOS -archivePath StarthbournePartners.xcarchive archive"
+    "build:ios": "echo 'iOS build not supported - Android only'"
   },
   "dependencies": {
     "react": "18.2.0",
