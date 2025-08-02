@@ -49,12 +49,9 @@ jobs:
         # Set CI environment variable for native build mode
         echo "CI=true" >> $GITHUB_ENV
 
-    - name: Make Gradlew executable and setup keystore
+    - name: Make Gradlew executable
       working-directory: ./mobile/android
-      run: |
-        chmod +x ./gradlew
-        # Create debug keystore for signing APK using Java keytool
-        $JAVA_HOME/bin/keytool -genkeypair -v -keystore app/debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US" || echo "Keystore creation failed, continuing without signing"
+      run: chmod +x ./gradlew
 
     - name: Build Android APK with clean
       working-directory: ./mobile/android
@@ -62,8 +59,8 @@ jobs:
         echo "=== CI Environment Variables ==="
         echo "CI: $CI"
         echo "GITHUB_ENV: $GITHUB_ENV"
-        echo "=== Building APK in CI mode ==="
-        ./gradlew clean assembleRelease --no-daemon --stacktrace --refresh-dependencies --info
+        echo "=== Building unsigned APK in CI mode ==="
+        ./gradlew clean assembleRelease --no-daemon --stacktrace --refresh-dependencies
 
     - name: Debug APK output location
       run: |
@@ -73,8 +70,11 @@ jobs:
         ls -la mobile/android/app/build/outputs/ || echo "outputs directory not found"
         ls -la mobile/android/app/build/outputs/apk/ || echo "apk directory not found"
         ls -la mobile/android/app/build/outputs/apk/release/ || echo "release directory not found"
-        echo "=== Checking alternative APK locations ==="
-        find mobile/android -name "*.apk" -exec ls -la {} \;
+        echo "=== APK file details ==="
+        find mobile/android/app/build/outputs -name "*.apk" -exec ls -la {} \;
+        echo "=== Expected APK names (unsigned) ==="
+        ls -la mobile/android/app/build/outputs/apk/release/*unsigned*.apk || echo "No unsigned APK found"
+        ls -la mobile/android/app/build/outputs/apk/release/app-release*.apk || echo "No app-release APK found"
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
