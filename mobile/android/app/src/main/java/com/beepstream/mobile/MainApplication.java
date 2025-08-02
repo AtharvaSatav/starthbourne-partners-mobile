@@ -52,10 +52,20 @@ public class MainApplication extends Application implements ReactApplication {
   @Override
   public void onCreate() {
     super.onCreate();
-    SoLoader.init(this, /* native exopackage */ false);
-    if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
-      // If you opted-in for the New Architecture, we load the native entry point for this app.
-      DefaultNewArchitectureEntryPoint.load();
+    
+    // Only initialize React Native if not in CI mode
+    boolean isCI = System.getenv("CI") != null && System.getenv("CI").equals("true");
+    if (!isCI) {
+      try {
+        SoLoader.init(this, /* native exopackage */ false);
+        if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+          // If you opted-in for the New Architecture, we load the native entry point for this app.
+          DefaultNewArchitectureEntryPoint.load();
+        }
+      } catch (Exception e) {
+        // Fallback to native mode if React Native initialization fails
+        android.util.Log.w("BeepStream", "React Native initialization failed, running in native mode", e);
+      }
     }
   }
 }
