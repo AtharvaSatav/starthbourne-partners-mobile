@@ -21,7 +21,7 @@
     "@notifee/react-native": "^7.8.0",
     "react-native-permissions": "^4.1.5",
     "react-native-background-fetch": "^4.2.2",
-    "react-native-wake-lock": "^2.0.0",
+    "react-native-wake-lock": "^1.0.1",
     "@react-navigation/native": "^6.1.0",
     "@react-navigation/native-stack": "^6.9.0",
     "react-native-screens": "^3.25.0",
