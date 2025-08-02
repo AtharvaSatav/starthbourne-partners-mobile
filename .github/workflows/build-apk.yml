@@ -16,14 +16,14 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Setup Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: '18'
         cache: 'npm'
         cache-dependency-path: mobile/package-lock.json
 
     - name: Setup Java
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: '17'
@@ -44,7 +44,7 @@ jobs:
       run: ./gradlew assembleRelease
 
     - name: Upload APK
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: beepstream-android-apk
         path: mobile/android/app/build/outputs/apk/release/app-release.apk
@@ -52,12 +52,10 @@ jobs:
 
     - name: Create Release
       if: github.ref == 'refs/heads/main'
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v1
       with:
         tag_name: v${{ github.run_number }}
-        release_name: BeepStream Mobile v${{ github.run_number }}
+        name: BeepStream Mobile v${{ github.run_number }}
         body: |
           Automated build of BeepStream mobile app.
           
@@ -72,16 +70,6 @@ jobs:
           - Audio alerts for critical logs
           - Kill switch functionality
           - Daily archival integration
+        files: mobile/android/app/build/outputs/apk/release/app-release.apk
         draft: false
         prerelease: false
-
-    - name: Upload Release Asset
-      if: github.ref == 'refs/heads/main'
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: mobile/android/app/build/outputs/apk/release/app-release.apk
-        asset_name: beepstream-mobile.apk
-        asset_content_type: application/vnd.android.package-archive
