@@ -33,7 +33,7 @@ jobs:
       working-directory: ./mobile
       run: npm install
 
-    - name: Clean Gradle cache and problematic libraries
+    - name: Clean Gradle cache and remove problematic libraries
       run: |
         # Clean Gradle cache completely
         rm -rf ~/.gradle/caches/jars-9/
@@ -41,9 +41,14 @@ jobs:
         rm -rf ~/.gradle/caches/transforms-*
         rm -rf ~/.gradle/daemon/
         
-        # Remove problematic gesture handler and reanimated that cause CI issues
+        # Remove problematic gesture handler and reanimated from node_modules
+        # This ensures they can't be auto-linked even if config fails
         rm -rf mobile/node_modules/react-native-gesture-handler
         rm -rf mobile/node_modules/react-native-reanimated
+        
+        # Also remove from package.json to prevent npm from installing them
+        cd mobile
+        npm uninstall react-native-gesture-handler react-native-reanimated --save
 
     - name: Make Gradlew executable
       working-directory: ./mobile/android

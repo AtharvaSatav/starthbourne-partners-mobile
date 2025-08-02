@@ -6,14 +6,6 @@ def reactNativeCliPath = "../node_modules/@react-native-community/cli-platform-a
 if (file(reactNativeCliPath).exists()) {
     apply from: reactNativeCliPath
     applyNativeModulesSettingsGradle(settings)
-    
-    // Exclude problematic projects that cause build issues
-    if (findProject(':react-native-gesture-handler')) {
-        project(':react-native-gesture-handler').projectDir = null
-    }
-    if (findProject(':react-native-reanimated')) {
-        project(':react-native-reanimated').projectDir = null
-    }
 }
 
 // Include React Native Gradle plugin only if it exists
