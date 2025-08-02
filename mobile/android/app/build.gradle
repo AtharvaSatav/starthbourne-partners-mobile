@@ -6,9 +6,9 @@ import com.android.build.OutputFile
 def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
 
 react {
-    entryFile = "index.js"
-    root = projectRoot
-    reactNativeDir = new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim()).getParentFile().getAbsoluteFile()
+    entryFile = file("../index.js")
+    root = file(projectRoot)
+    reactNativeDir = file("../node_modules/react-native")
     inputExcludes = ["android/**", "ios/**"]
 }
 
@@ -18,8 +18,9 @@ def jscFlavor = 'org.webkit:android-jsc:+'
 def enableHermes = project.ext.react.get("enableHermes", true);
 
 android {
-    ndkVersion "25.1.8937393"
+    namespace "com.beepstream.mobile"
     compileSdkVersion 34
+    ndkVersion "25.1.8937393"
 
     defaultConfig {
         applicationId "com.beepstream.mobile"
@@ -40,21 +41,11 @@ android {
         }
     }
     
-    signingConfigs {
-        debug {
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-        }
-    }
-    
     buildTypes {
         debug {
-            signingConfig signingConfigs.debug
+            debuggable true
         }
         release {
-            signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
