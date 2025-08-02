@@ -14,7 +14,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:8.1.1")
+        classpath("com.android.tools.build:gradle:8.1.0")
         classpath("com.facebook.react:react-native-gradle-plugin:0.73.0")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
     }
@@ -25,5 +25,22 @@ allprojects {
         google()
         mavenCentral()
         maven { url "https://www.jitpack.io" }
+        // Workaround for https://github.com/react-native-community/cli/issues/1673
+        exclusiveContent {
+            filter {
+                includeGroup "com.facebook.react"
+            }
+            forRepository {
+                maven {
+                    url "$rootDir/../node_modules/react-native/android"
+                }
+            }
+        }
+    }
+    
+    configurations.all {
+        resolutionStrategy {
+            force "com.facebook.react:react-native:0.73.0"
+        }
     }
 }
