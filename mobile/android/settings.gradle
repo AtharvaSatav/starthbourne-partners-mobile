@@ -1,4 +1,16 @@
 rootProject.name = 'BeepStreamMobile'
-apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
 include ':app'
-includeBuild('../node_modules/@react-native/gradle-plugin')
+project(':app').projectDir = new File(rootProject.projectDir, 'app')
+
+// Apply React Native settings if available
+def reactNativeCliPath = "../node_modules/@react-native-community/cli-platform-android"
+if (file(reactNativeCliPath).exists()) {
+    apply from: file("$reactNativeCliPath/native_modules.gradle")
+    applyNativeModulesSettingsGradle(settings)
+}
+
+// Include React Native Gradle plugin if available
+def reactNativeGradlePluginPath = "../node_modules/@react-native/gradle-plugin"
+if (file(reactNativeGradlePluginPath).exists()) {
+    includeBuild(reactNativeGradlePluginPath)
+}
