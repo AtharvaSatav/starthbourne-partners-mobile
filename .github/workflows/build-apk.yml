@@ -1,0 +1,87 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: mobile/package-lock.json
+
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Install mobile dependencies
+      working-directory: ./mobile
+      run: npm install
+
+    - name: Make Gradlew executable
+      working-directory: ./mobile/android
+      run: chmod +x ./gradlew
+
+    - name: Build Android APK
+      working-directory: ./mobile/android
+      run: ./gradlew assembleRelease
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: beepstream-android-apk
+        path: mobile/android/app/build/outputs/apk/release/app-release.apk
+        retention-days: 30
+
+    - name: Create Release
+      if: github.ref == 'refs/heads/main'
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: BeepStream Mobile v${{ github.run_number }}
+        body: |
+          Automated build of BeepStream mobile app.
+          
+          ## Installation Instructions
+          1. Download the APK file below
+          2. Enable "Unknown sources" in Android settings
+          3. Install the APK on your phone
+          
+          ## Features
+          - Real-time log monitoring
+          - Background notifications
+          - Audio alerts for critical logs
+          - Kill switch functionality
+          - Daily archival integration
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      if: github.ref == 'refs/heads/main'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: mobile/android/app/build/outputs/apk/release/app-release.apk
+        asset_name: beepstream-mobile.apk
+        asset_content_type: application/vnd.android.package-archive
