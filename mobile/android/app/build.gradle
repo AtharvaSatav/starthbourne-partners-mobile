@@ -50,6 +50,18 @@ android {
         versionName "1.0"
     }
 
+    signingConfigs {
+        release {
+            // Use debug signing for CI builds to avoid certificate requirements
+            if (file("debug.keystore").exists()) {
+                storeFile file("debug.keystore")
+                storePassword "android"
+                keyAlias "androiddebugkey"
+                keyPassword "android"
+            }
+        }
+    }
+
     buildTypes {
         debug {
             debuggable true
@@ -59,6 +71,10 @@ android {
         release {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            // Only use signing config if keystore exists
+            if (file("debug.keystore").exists()) {
+                signingConfig signingConfigs.release
+            }
             // Check if CI environment to determine which Application to use
             def isCI = System.getenv("CI") == "true"
             manifestPlaceholders = [applicationClass: isCI ? ".NativeMainApplication" : ".MainApplication"]

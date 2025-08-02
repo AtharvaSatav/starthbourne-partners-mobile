@@ -49,19 +49,38 @@ jobs:
         # Set CI environment variable for native build mode
         echo "CI=true" >> $GITHUB_ENV
 
-    - name: Make Gradlew executable
+    - name: Make Gradlew executable and setup keystore
       working-directory: ./mobile/android
-      run: chmod +x ./gradlew
+      run: |
+        chmod +x ./gradlew
+        # Create debug keystore for signing APK using Java keytool
+        $JAVA_HOME/bin/keytool -genkeypair -v -keystore app/debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US" || echo "Keystore creation failed, continuing without signing"
 
     - name: Build Android APK with clean
       working-directory: ./mobile/android
-      run: ./gradlew clean assembleRelease --no-daemon --stacktrace --refresh-dependencies
+      run: |
+        echo "=== CI Environment Variables ==="
+        echo "CI: $CI"
+        echo "GITHUB_ENV: $GITHUB_ENV"
+        echo "=== Building APK in CI mode ==="
+        ./gradlew clean assembleRelease --no-daemon --stacktrace --refresh-dependencies --info
+
+    - name: Debug APK output location
+      run: |
+        echo "=== Searching for generated APK files ==="
+        find mobile/android -name "*.apk" -type f | head -10
+        echo "=== Checking build outputs directory ==="
+        ls -la mobile/android/app/build/outputs/ || echo "outputs directory not found"
+        ls -la mobile/android/app/build/outputs/apk/ || echo "apk directory not found"
+        ls -la mobile/android/app/build/outputs/apk/release/ || echo "release directory not found"
+        echo "=== Checking alternative APK locations ==="
+        find mobile/android -name "*.apk" -exec ls -la {} \;
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: beepstream-android-apk
-        path: mobile/android/app/build/outputs/apk/release/app-release.apk
+        path: mobile/android/app/build/outputs/apk/release/*.apk
         retention-days: 30
 
     - name: Create Release
@@ -84,6 +103,8 @@ jobs:
           - Audio alerts for critical logs
           - Kill switch functionality
           - Daily archival integration
-        files: mobile/android/app/build/outputs/apk/release/app-release.apk
+        files: mobile/android/app/build/outputs/apk/release/*.apk
         draft: false
         prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
