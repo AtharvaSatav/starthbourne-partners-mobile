@@ -53,16 +53,33 @@ android {
     buildTypes {
         debug {
             debuggable true
+            // Use React Native Application in debug mode
+            manifestPlaceholders = [applicationClass: ".MainApplication"]
         }
         release {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            // Check if CI environment to determine which Application to use
+            def isCI = System.getenv("CI") == "true"
+            manifestPlaceholders = [applicationClass: isCI ? ".NativeMainApplication" : ".MainApplication"]
         }
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    
+    // Conditionally exclude React Native MainApplication in CI mode
+    def isCI = System.getenv("CI") == "true"
+    if (isCI) {
+        sourceSets {
+            main {
+                java {
+                    exclude '**/MainApplication.java'
+                }
+            }
+        }
     }
 }
 
