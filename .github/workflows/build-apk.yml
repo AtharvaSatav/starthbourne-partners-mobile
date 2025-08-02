@@ -37,9 +37,16 @@ jobs:
       working-directory: ./mobile/android
       run: chmod +x ./gradlew
 
+    - name: Clean Gradle cache
+      working-directory: ./mobile/android
+      run: |
+        ./gradlew clean
+        rm -rf ~/.gradle/caches/jars-9/
+        rm -rf ~/.gradle/caches/modules-2/
+
     - name: Build Android APK
       working-directory: ./mobile/android
-      run: ./gradlew assembleRelease
+      run: ./gradlew assembleRelease --no-daemon --stacktrace
 
     - name: Upload APK
       uses: actions/upload-artifact@v4

@@ -40,4 +40,12 @@ allprojects {
             }
         }
     }
+    
+    configurations.all {
+        resolutionStrategy {
+            // Force specific versions to avoid cache corruption
+            force 'org.bouncycastle:bcprov-jdk18on:1.78'
+            force 'org.bouncycastle:bcutil-jdk18on:1.78'
+        }
+    }
 }
