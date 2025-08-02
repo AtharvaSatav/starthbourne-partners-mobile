@@ -78,12 +78,18 @@ dependencies {
     // React Native dependencies - only if React Native exists
     if (reactNativeDir.exists()) {
         //noinspection GradleDynamicVersion
-        implementation "com.facebook.react:react-native:+"
+        implementation("com.facebook.react:react-native:+") {
+            // Exclude problematic gesture handler that causes build issues
+            exclude group: 'com.swmansion.gesturehandler'
+            exclude group: 'com.swmansion.reanimated'
+        }
         
         if (enableHermes) {
             //noinspection GradleDynamicVersion
             implementation("com.facebook.react:hermes-engine:+") {
                 exclude group:'com.facebook.fbjni'
+                exclude group: 'com.swmansion.gesturehandler'
+                exclude group: 'com.swmansion.reanimated'
             }
         } else {
             implementation jscFlavor

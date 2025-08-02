@@ -46,6 +46,10 @@ allprojects {
             // Force specific versions to avoid cache corruption
             force 'org.bouncycastle:bcprov-jdk18on:1.78'
             force 'org.bouncycastle:bcutil-jdk18on:1.78'
+            
+            // Exclude problematic libraries that cause CI issues
+            exclude group: 'com.swmansion.gesturehandler', module: 'react-native-gesture-handler'
+            exclude group: 'com.swmansion.reanimated', module: 'react-native-reanimated'
         }
     }
 }
