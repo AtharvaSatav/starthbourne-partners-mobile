@@ -25,22 +25,5 @@ allprojects {
         google()
         mavenCentral()
         maven { url "https://www.jitpack.io" }
-        // Workaround for https://github.com/react-native-community/cli/issues/1673
-        exclusiveContent {
-            filter {
-                includeGroup "com.facebook.react"
-            }
-            forRepository {
-                maven {
-                    url "$rootDir/../node_modules/react-native/android"
-                }
-            }
-        }
-    }
-    
-    configurations.all {
-        resolutionStrategy {
-            force "com.facebook.react:react-native:0.73.0"
-        }
     }
 }
