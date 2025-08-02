@@ -70,13 +70,14 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     
-    // Conditionally exclude React Native MainApplication in CI mode
+    // Conditionally exclude React Native files in CI mode
     def isCI = System.getenv("CI") == "true"
     if (isCI) {
         sourceSets {
             main {
                 java {
                     exclude '**/MainApplication.java'
+                    exclude '**/MainActivity.java'
                 }
             }
         }
