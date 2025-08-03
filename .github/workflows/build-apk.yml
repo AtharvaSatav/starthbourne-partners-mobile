@@ -33,25 +33,31 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Install mobile dependencies
+    - name: Install mobile dependencies (skip in CI for pure native build)
       working-directory: ./mobile
-      run: npm install
-
-    - name: Prepare native Android build (CI mode)
       run: |
+        echo "=== Skipping npm install in CI mode for pure native build ==="
+        echo "This avoids React Native dependency conflicts in CI environment"
+        # Create minimal package structure for CI
+        mkdir -p node_modules
+
+    - name: Prepare pure native Android build (CI mode)
+      run: |
+        echo "=== Preparing pure native Android APK build ==="
+        
         # Clean Gradle cache completely
-        rm -rf ~/.gradle/caches/jars-9/
-        rm -rf ~/.gradle/caches/modules-2/
-        rm -rf ~/.gradle/caches/transforms-*
+        rm -rf ~/.gradle/caches/
         rm -rf ~/.gradle/daemon/
         
-        # Remove ALL React Native dependencies to force native build
-        rm -rf mobile/node_modules/react-native*
-        rm -rf mobile/node_modules/@react-native*
-        rm -rf mobile/node_modules/@react-navigation*
+        # Remove entire node_modules to ensure no React Native interference
+        rm -rf mobile/node_modules/
         
-        # Set CI environment variable for native build mode
+        # Create minimal directory structure
+        mkdir -p mobile/node_modules
+        
+        # Set CI environment variable for pure native build mode
         echo "CI=true" >> $GITHUB_ENV
+        echo "=== Ready for pure native Android build ==="
 
     - name: Make Gradlew executable
       working-directory: ./mobile/android

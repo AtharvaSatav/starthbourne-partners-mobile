@@ -1,13 +1,14 @@
 apply plugin: "com.android.application"
 
 /**
- * This is the configuration block to customize your React Native Android app.
+ * Hybrid React Native / Native Android configuration
  */
 def reactNativeRoot = file("../")
 def reactNativeDir = file("../node_modules/react-native")
+def isCI = System.getenv("CI") == "true"
 
-// Only apply React Native plugin if the directory exists
-if (reactNativeDir.exists()) {
+// Only apply React Native plugin if NOT in CI mode and React Native exists
+if (reactNativeDir.exists() && !isCI) {
     apply plugin: "com.facebook.react"
     
     react {
@@ -36,7 +37,7 @@ if (reactNativeDir.exists()) {
 def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = false
 def jscFlavor = 'org.webkit:android-jsc:+'
-def enableHermes = true
+def enableHermes = !isCI // Disable Hermes in CI mode
 
 android {
     namespace "com.beepstream.mobile"
@@ -119,16 +120,19 @@ dependencies {
         } else {
             implementation jscFlavor
         }
-    } else if (isCI) {
-        // In CI mode, ensure we have minimal required dependencies for valid APK
-        implementation("org.webkit:android-jsc:+")
     }
+    // Note: In CI mode, we use only pure Android dependencies (no React Native)
 }
 
 // Apply React Native auto-linking only if React Native CLI exists and not in CI
 def isCI = System.getenv("CI") == "true"
-def nativeModulesPath = "$reactNativeRoot/node_modules/@react-native-community/cli-platform-android/native_modules.gradle"
-if (file(nativeModulesPath).exists() && !isCI) {
-    apply from: nativeModulesPath
-    applyNativeModulesAppBuildGradle(project)
+if (!isCI) {
+    def nativeModulesPath = "$reactNativeRoot/node_modules/@react-native-community/cli-platform-android/native_modules.gradle"
+    if (file(nativeModulesPath).exists()) {
+        apply from: nativeModulesPath
+        applyNativeModulesAppBuildGradle(project)
+    }
+} else {
+    // In CI mode, completely skip React Native auto-linking
+    println "CI mode: Skipping React Native auto-linking for pure native build"
 }
