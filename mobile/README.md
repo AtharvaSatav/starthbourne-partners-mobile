@@ -1,202 +1,151 @@
 # Starthbourne Partners Mobile App
 
-A React Native mobile application for real-time logging with WebSocket connectivity, push notifications, and background monitoring capabilities.
+🚨 **Real-time logging mobile app with critical alert system and 24/7 background monitoring**
 
 ## Features
 
-- **Real-time Log Monitoring**: Live updates via WebSocket connection
-- **Push Notifications**: Background notifications for new log entries  
-- **Continuous Audio Alerts**: Beeping notifications for critical logs
-- **Kill Switch**: Send stop signals to external scripts
-- **Daily Archival**: Automatic cleanup and organization
-- **Cross-Platform**: Works on both iOS and Android
+### 🔔 Critical Alert System
+- **Full-screen alerts** that wake phone even when locked
+- **Continuous beeping** for critical logs until acknowledged
+- **Repeating reminders** every 30 seconds for unacknowledged alerts
+- **Works through Do Not Disturb** mode
+
+### 📱 Background Monitoring
+- **True 24/7 operation** - receives notifications when app is closed
+- **Background API polling** every 15 seconds to 2 minutes when closed
+- **Automatic permission setup** wizard on first launch
+- **Battery optimization bypass** for reliable operation
+
+### 🗂️ Daily Management
+- **Automatic cleanup** at 6 PM daily (even when app closed)
+- **Log archival system** with local storage
+- **Manual archive** option available after 6 PM
+- **Cleanup status display** with next/last cleanup times
+
+### 🔗 Real-time Connectivity
+- **WebSocket connection** for live updates when app is open
+- **API integration** with your existing Replit backend
+- **Kill switch functionality** for emergency stops
+- **Automatic reconnection** handling
+
+## Quick Start
+
+### Download & Install
+1. **Download APK** from [GitHub Releases](../../releases/latest)
+2. **Enable unknown sources** on your Android device
+3. **Install APK** and open app
+4. **Follow setup wizard** - tap "Setup Permissions" and allow all requests
+5. **Test critical alerts** by sending beep log via API
+
+### API Integration
+The app connects to your existing backend:
+- **API Endpoint**: `your-replit-url/api/logs`
+- **WebSocket**: `your-replit-url/ws`
+- **Kill Switch**: Send WebSocket message `{type: "KILL_SWITCH", data: "STOP"}`
+
+### Send Test Alert
+```bash
+curl -X POST your-replit-url/api/logs \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Critical system alert",
+    "beepType": "beep",
+    "source": "monitoring-system"
+  }'
+```
 
 ## Architecture
 
-- **Frontend**: React Native with TypeScript
-- **State Management**: TanStack Query for server state
-- **Navigation**: React Navigation v6
-- **Audio**: React Native Sound for beep notifications
-- **Push Notifications**: React Native Push Notification
-- **WebSocket**: Native WebSocket implementation
-- **Backend**: Connects to existing Replit API
+### Technology Stack
+- **React Native 0.73** with TypeScript
+- **TanStack Query** for server state management  
+- **React Navigation** for screen management
+- **React Native Push Notification** for background alerts
+- **React Native Background Fetch** for API polling when closed
+- **AsyncStorage** for local data persistence
 
-## API Endpoints
+### Permission System
+Automatically requests and manages:
+- ✅ **Notifications** - Basic notification access
+- ✅ **Critical Alarms** - Exact alarm scheduling  
+- ✅ **Display Over Apps** - Full-screen alerts over lock screen
+- ✅ **Battery Optimization** - Bypass Android power management
+- ✅ **Do Not Disturb** - Break through silent mode
+- ✅ **Boot Completion** - Start after device restart
+- ✅ **Foreground Service** - Background operation capability
 
-The app connects to your existing Replit backend:
-
-- **API**: `https://c7a311a9-5bb5-4fe9-82f2-6ebfa5e9ffff-00-36r638d8u9zww.picard.replit.dev/api/logs`
-- **WebSocket**: `wss://c7a311a9-5bb5-4fe9-82f2-6ebfa5e9ffff-00-36r638d8u9zww.picard.replit.dev/ws`
-
-## Setup Instructions
-
-### Prerequisites
-
-1. Node.js (v18 or higher)
-2. React Native CLI
-3. Android Studio (for Android development)
-4. Xcode (for iOS development - macOS only)
-
-### Installation
-
-1. **Install dependencies:**
-   ```bash
-   cd mobile
-   npm install
-   ```
-
-2. **Install iOS dependencies (macOS only):**
-   ```bash
-   cd ios && pod install && cd ..
-   ```
-
-3. **Configure Android:**
-   - Open Android Studio
-   - Open the `android` folder
-   - Sync project with Gradle files
+### Background Services
+1. **Background Fetch Service** - Polls API every 15 seconds to 2 minutes when app closed
+2. **Daily Cleanup Scheduler** - Triggers log archival at 6 PM daily
+3. **Push Notification Handler** - Manages alert interactions and acknowledgments
 
 ## Development
 
-### Run on Android
+### Build from Source
 ```bash
+# Install dependencies
+npm install
+
+# Run on Android device
 npm run android
+
+# Build release APK
+cd android && ./gradlew assembleRelease
 ```
 
-### Run on iOS (macOS only)
-```bash
-npm run ios
-```
+### Automatic Builds
+- **GitHub Actions** builds APK automatically on every commit
+- **Download** from Releases tab or Actions artifacts
+- **Version numbering** increments automatically
 
-### Start Metro bundler
-```bash
-npm start
-```
+## Testing
 
-## Building for Production
+### Critical Alert Test
+1. **Close app completely** (not just minimize)
+2. **Wait 2-3 minutes** for background service activation
+3. **Send beep log** via API
+4. **Should receive** persistent critical alert within 2 minutes
+5. **Repeating reminders** every 30 seconds until acknowledged
 
-### Android APK
-```bash
-cd android
-./gradlew assembleRelease
-```
-The APK will be generated at: `android/app/build/outputs/apk/release/app-release.apk`
+### Background Monitoring Test  
+1. **Send regular log** via API while app closed
+2. **Should receive** standard notification within 2 minutes
+3. **App syncs** when reopened
 
-### iOS App (macOS only)
-```bash
-cd ios
-xcodebuild -workspace StarthbournePartners.xcworkspace -scheme StarthbournePartners -configuration Release -destination generic/platform=iOS -archivePath StarthbournePartners.xcarchive archive
-```
-
-## Distribution
-
-### Android
-1. **Google Play Store:**
-   - Upload APK to Google Play Console
-   - Complete store listing and compliance
-
-2. **Direct Installation:**
-   - Share APK file directly
-   - Users need to enable "Unknown sources" in Android settings
-
-### iOS
-1. **Apple App Store:**
-   - Submit through App Store Connect
-   - Requires Apple Developer Program membership ($99/year)
-
-2. **TestFlight (Beta):**
-   - Distribute to up to 10,000 beta testers
-   - No App Store review required for internal testing
-
-## Key Features
-
-### Background Notifications
-- Receives push notifications even when app is closed
-- Critical for monitoring systems that need 24/7 awareness
-- Notifications include log source and message content
-
-### Continuous Beeping
-- Audio alerts for logs marked as "beep" type
-- Continues until user manually stops
-- Works when app is in foreground
-
-### Kill Switch Integration
-- Send emergency stop signals to external Python scripts
-- Real-time WebSocket communication
-- Confirmation dialogs to prevent accidental triggers
-
-### Daily Archival Integration
-- Automatically syncs with server's 6 PM daily cleanup
-- Shows archive notifications
-- Maintains clean active log display
-
-## Permissions Required
-
-### Android
-- `INTERNET`: API and WebSocket connectivity
-- `WAKE_LOCK`: Keep app responsive for notifications
-- `VIBRATE`: Notification vibration
-- `RECEIVE_BOOT_COMPLETED`: Restart notification service after reboot
-- `FOREGROUND_SERVICE`: Background processing
-
-### iOS
-- Background App Refresh
-- Notifications permission
-- Network access
+### Daily Cleanup Test
+1. **Set phone time** to 6:00 PM or later
+2. **Should trigger** automatic log archival
+3. **Check cleanup status** shows last cleanup time
 
 ## Troubleshooting
 
-### Common Issues
+### No Critical Alerts
+- Verify all permissions granted in phone settings
+- Check battery optimization is disabled for app
+- Ensure Do Not Disturb allows this app
 
-1. **Metro bundler not starting:**
-   ```bash
-   npx react-native start --reset-cache
-   ```
+### No Background Notifications  
+- Confirm app has notification permissions
+- Check background app refresh is enabled
+- Verify network connectivity
 
-2. **Android build errors:**
-   ```bash
-   cd android && ./gradlew clean && cd ..
-   ```
+### Setup Wizard Issues
+- Manually grant permissions in phone Settings → Apps → Starthbourne Partners
+- Restart app to re-check permission status
 
-3. **iOS build errors:**
-   ```bash
-   cd ios && rm -rf Pods Podfile.lock && pod install && cd ..
-   ```
+## Security & Privacy
 
-4. **Push notifications not working:**
-   - Check device notification permissions
-   - Verify app is not in power saving mode
-   - Test on physical device (not simulator)
-
-### Performance Tips
-
-- Keep app in foreground when actively monitoring
-- Disable battery optimization for the app
-- Use WiFi for stable WebSocket connections
-- Clear old logs regularly to maintain performance
-
-## Development vs Production
-
-### Development
-- Uses Metro bundler for hot reloading
-- Debug builds with development tools
-- Can connect to localhost backends
-
-### Production
-- Optimized bundles for smaller app size
-- Release builds with performance optimizations
-- Production API endpoints only
-
-## Contributing
-
-1. Fork the repository
-2. Create feature branch
-3. Make changes with proper TypeScript types
-4. Test on both iOS and Android
-5. Submit pull request
+- **Local data only** - logs stored locally on device
+- **Your API only** - connects exclusively to your Replit backend  
+- **No tracking** - no analytics or third-party services
+- **Open source** - full code available for review
 
 ## Support
 
-For issues or questions:
-- Check existing GitHub issues
-- Create new issue with device/OS information
-- Include logs and reproduction steps
+- **Issues**: Create GitHub issue with device info and logs
+- **Features**: Submit feature requests via GitHub discussions
+- **Updates**: Automatic via GitHub Actions builds
+
+---
+
+**Built for 24/7 critical monitoring with enterprise-grade reliability**

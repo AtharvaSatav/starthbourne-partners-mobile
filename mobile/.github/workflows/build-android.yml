@@ -1,0 +1,111 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: mobile/package-lock.json
+        
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      
+    - name: Accept Android SDK licenses
+      run: yes | sdkmanager --licenses || true
+      
+    - name: Install dependencies
+      working-directory: mobile
+      run: |
+        npm ci --prefer-offline --no-audit
+        
+    - name: Create gradle.properties
+      working-directory: mobile/android
+      run: |
+        echo "org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=512m" >> gradle.properties
+        echo "android.useAndroidX=true" >> gradle.properties
+        echo "android.enableJetifier=true" >> gradle.properties
+        
+    - name: Make gradlew executable
+      working-directory: mobile/android
+      run: chmod +x gradlew
+      
+    - name: Clean project
+      working-directory: mobile/android
+      run: ./gradlew clean
+      
+    - name: Build APK
+      working-directory: mobile/android
+      run: ./gradlew assembleRelease --no-daemon --stacktrace
+      
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: starthbourne-partners-${{ github.sha }}
+        path: mobile/android/app/build/outputs/apk/release/app-release.apk
+        retention-days: 30
+        
+    - name: Create release (if on main branch)
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Starthbourne Partners v${{ github.run_number }}
+        body: |
+          🚨 **Starthbourne Partners Mobile App - Build v${{ github.run_number }}**
+          
+          **Critical Alert System:**
+          - ✅ Full-screen alerts that wake phone when locked
+          - ✅ 24/7 background monitoring when app is closed  
+          - ✅ Automatic permission setup wizard
+          - ✅ Daily log cleanup at 6 PM (even when closed)
+          
+          **Changes in this release:**
+          - ${{ github.event.head_commit.message }}
+          
+          **📱 Installation Instructions:**
+          1. Download `starthbourne-partners-v${{ github.run_number }}.apk` below
+          2. Enable "Install unknown apps" on your Android device
+          3. Install the APK file
+          4. Open app and follow setup wizard - grant all permissions
+          5. Test with API: `curl -X POST your-api/logs -d '{"message":"test","beepType":"beep"}'`
+          
+          **🔗 Connect to your API:**
+          - Update `API_URL` in app to point to your Replit backend
+          - App will receive real-time notifications via WebSocket and background polling
+        draft: false
+        prerelease: false
+        
+    - name: Upload APK to release
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: mobile/android/app/build/outputs/apk/release/app-release.apk
+        asset_name: starthbourne-partners-v${{ github.run_number }}.apk
+        asset_content_type: application/vnd.android.package-archive
