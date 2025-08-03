@@ -79,6 +79,22 @@ jobs:
         echo "=== Expected APK names (unsigned) ==="
         ls -la mobile/android/app/build/outputs/apk/release/*unsigned*.apk || echo "No unsigned APK found"
         ls -la mobile/android/app/build/outputs/apk/release/app-release*.apk || echo "No app-release APK found"
+        
+    - name: Validate APK integrity
+      run: |
+        echo "=== Validating APK integrity ==="
+        APK_PATH=$(find mobile/android/app/build/outputs/apk/release -name "*.apk" | head -1)
+        if [ -f "$APK_PATH" ]; then
+          echo "Found APK: $APK_PATH"
+          echo "APK Size: $(du -h "$APK_PATH" | cut -f1)"
+          echo "APK Details:"
+          file "$APK_PATH"
+          # Use aapt to validate APK structure
+          $ANDROID_HOME/build-tools/34.0.0/aapt dump badging "$APK_PATH" | head -10 || echo "AAPT validation failed"
+        else
+          echo "ERROR: No APK file found!"
+          exit 1
+        fi
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
