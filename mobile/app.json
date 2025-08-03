@@ -1,6 +1,4 @@
 {
-  "name": "StarthbournePartners",
-  "displayName": "Starthbourne Partners",
   "expo": {
     "name": "Starthbourne Partners",
     "slug": "starthbourne-partners",
@@ -18,17 +16,37 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.starthbournepartners.app"
+      "bundleIdentifier": "com.starthbourne.partners"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "package": "com.starthbournepartners.app"
+      "package": "com.starthbourne.partners",
+      "permissions": [
+        "android.permission.VIBRATE",
+        "android.permission.WAKE_LOCK",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.USE_FULL_SCREEN_INTENT",
+        "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#ffffff",
+          "sounds": ["./assets/notification-sound.wav"]
+        }
+      ]
+    ]
   }
 }
