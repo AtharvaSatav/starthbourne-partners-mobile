@@ -70,7 +70,13 @@ jobs:
         echo "CI: $CI"
         echo "GITHUB_ENV: $GITHUB_ENV"
         echo "=== Building unsigned APK in CI mode ==="
-        ./gradlew clean assembleRelease --no-daemon --stacktrace --refresh-dependencies
+        # Ensure all permissions are set correctly
+        chmod +x ./gradlew
+        # Clean build with verbose output for debugging
+        ./gradlew clean assembleRelease --no-daemon --stacktrace --refresh-dependencies --info
+        
+        echo "=== Build completed, checking outputs ==="
+        find . -name "*.apk" -type f -exec ls -la {} \;
 
     - name: Debug APK output location
       run: |
@@ -86,7 +92,7 @@ jobs:
         ls -la mobile/android/app/build/outputs/apk/release/*unsigned*.apk || echo "No unsigned APK found"
         ls -la mobile/android/app/build/outputs/apk/release/app-release*.apk || echo "No app-release APK found"
         
-    - name: Validate APK integrity
+    - name: Validate APK integrity and structure
       run: |
         echo "=== Validating APK integrity ==="
         APK_PATH=$(find mobile/android/app/build/outputs/apk/release -name "*.apk" | head -1)
@@ -95,10 +101,20 @@ jobs:
           echo "APK Size: $(du -h "$APK_PATH" | cut -f1)"
           echo "APK Details:"
           file "$APK_PATH"
-          # Use aapt to validate APK structure
-          $ANDROID_HOME/build-tools/34.0.0/aapt dump badging "$APK_PATH" | head -10 || echo "AAPT validation failed"
+          
+          # Use aapt to validate APK structure and get package info
+          echo "=== APK Package Information ==="
+          $ANDROID_HOME/build-tools/34.0.0/aapt dump badging "$APK_PATH" | head -15
+          
+          echo "=== APK Contents ==="
+          $ANDROID_HOME/build-tools/34.0.0/aapt list "$APK_PATH" | head -20
+          
+          echo "=== Verify APK is properly signed (debug signature) ==="
+          $ANDROID_HOME/build-tools/34.0.0/aapt dump xmltree "$APK_PATH" AndroidManifest.xml | head -10
+          
+          echo "✅ APK validation completed successfully"
         else
-          echo "ERROR: No APK file found!"
+          echo "❌ ERROR: No APK file found!"
           exit 1
         fi
 

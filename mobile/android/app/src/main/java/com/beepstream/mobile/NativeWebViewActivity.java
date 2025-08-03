@@ -93,7 +93,7 @@ public class NativeWebViewActivity extends Activity {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                    .setSmallIcon(android.R.drawable.ic_dialog_alert)
+                    .setSmallIcon(R.drawable.ic_notification)
                     .setContentTitle("BeepStream Critical Alert")
                     .setContentText(message)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)

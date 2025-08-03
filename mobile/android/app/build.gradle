@@ -50,14 +50,29 @@ android {
         versionCode 1
         versionName "1.0"
         
-        // Ensure APK has required components
+        // Ensure APK has required components for installation
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
+        
+        // Required for valid APK
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+        }
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
     }
 
     buildTypes {
         debug {
             debuggable true
+            signingConfig signingConfigs.debug
             // Use React Native Application in debug mode
             manifestPlaceholders = [applicationClass: ".MainApplication"]
         }
@@ -66,7 +81,10 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             // Check if CI environment to determine which Application to use
             manifestPlaceholders = [applicationClass: isCI ? ".NativeMainApplication" : ".MainApplication"]
-            // Note: No signing config = unsigned APK (perfectly valid for CI builds)
+            // Use debug signing for CI builds (creates installable unsigned APK)
+            signingConfig signingConfigs.debug
+            // Ensure APK has proper compression and alignment
+            zipAlignEnabled true
         }
     }
 

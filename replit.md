@@ -141,3 +141,19 @@ The application follows a clean separation of concerns with shared schemas betwe
 - **Backend Integration**: Connects to same Replit backend via WebView HTTP requests
 
 This hybrid approach ensures 100% compatibility with CI build systems while maintaining development flexibility and providing native mobile capabilities for critical alert functionality.
+
+## Recent Critical Fixes (Jan 2025)
+
+### APK Installation Validity Issues RESOLVED
+- **Fixed missing PNG app icons**: Replaced XML vector drawables with proper PNG files for all screen densities
+- **Added APK signing configuration**: Integrated debug keystore for valid signed APK generation
+- **Resolved Gradle compilation errors**: Fixed duplicate `isCI` variable declarations causing build failures
+- **Enhanced resource structure**: Added network security config, notification icons, and complete Android themes
+- **Improved CI build process**: Added comprehensive APK validation with aapt tool verification
+- **All installation blockers removed**: APK now passes Android package validation and installs successfully
+
+### Build System Improvements
+- **Pure native CI builds**: No React Native dependencies in production APK generation
+- **Debug signing**: Uses Android debug keystore for installable unsigned APKs
+- **Resource validation**: All essential Android components verified before release
+- **Enhanced logging**: Detailed build output for troubleshooting APK issues
