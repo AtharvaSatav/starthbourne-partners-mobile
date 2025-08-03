@@ -1,0 +1,23 @@
+# Copy these commands one by one into Replit terminal
+
+cd mobile
+
+git init
+
+git config user.name "Your Name"
+git config user.email "your-email@example.com"
+
+git add .
+
+git commit -m "Initial mobile app with GitHub Actions auto-build"
+
+# Replace YOUR_USERNAME with your GitHub username
+git remote add origin https://github.com/YOUR_USERNAME/starthbourne-partners-mobile.git
+
+git branch -M main
+
+git push -u origin main
+
+# When prompted:
+# Username: your-github-username
+# Password: your-personal-access-token (starts with ghp_)
