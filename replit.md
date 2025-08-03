@@ -4,7 +4,7 @@
 
 This is a full-stack web application built with React frontend and Express backend, designed as a logging system with real-time WebSocket communication. The application uses a modern tech stack including TypeScript, Tailwind CSS with shadcn/ui components, PostgreSQL with Drizzle ORM, and Neon as the database provider.
 
-**NEW: Hybrid Native Mobile App** - A hybrid native Android application is now available in the `/mobile` directory. The app intelligently switches between React Native mode (development) and pure native WebView mode (CI/production builds), providing critical alert functionality with native notifications and audio capabilities while avoiding React Native dependency compatibility issues in CI environments.
+**NEW: Native Mobile App** - A React Native mobile application is now available in the `/mobile` directory, providing the same functionality with additional native features like background push notifications and better audio handling.
 
 ## User Preferences
 
@@ -49,17 +49,18 @@ Preferred communication style: Simple, everyday language.
 - **Toast Notifications**: User feedback system
 - **Component Library**: Comprehensive UI components from shadcn/ui
 
-### Hybrid Mobile App Features (NEW)
-- **Intelligent Mode Switching**: React Native for development, native WebView for production builds
-- **Native Critical Alerts**: Full-screen notifications using Android's native notification system
-- **CI-Compatible Build**: Avoids React Native dependency issues during automated builds
-- **Native Audio System**: Uses Android's ToneGenerator for alarm-style audio alerts
-- **WebView Integration**: Loads the web app with native mobile enhancements
-- **JavaScript Bridge**: Exposes native functionality to web app via JavaScript interface
-- **Background Notifications**: Critical alerts even when app is minimized
-- **Production-Ready APKs**: Clean builds without React Native compatibility issues
-- **Fallback Architecture**: Graceful degradation when React Native components fail
-- **Native Permissions**: Handles critical notification permissions natively
+### Mobile App Features (NEW)
+- **Native Push Notifications**: Background alerts even when app is closed
+- **React Native Audio**: Superior audio handling with native sound system
+- **Cross-Platform**: Single codebase for iOS and Android
+- **Background Processing**: Maintains WebSocket connection in background
+- **App Store Distribution**: Installable via Google Play and Apple App Store
+- **Critical Alert System**: Full-screen notifications that wake phone like alarms
+- **Automatic Permission Setup**: First-time wizard guides users through required permissions
+- **24/7 Monitoring**: Works even when screen is off or in Do Not Disturb mode
+- **Background Daily Cleanup**: Automatic log archival at 6 PM even when app is closed
+- **Background Notification Service**: Receives API notifications via periodic polling when app is closed
+- **Critical Alert Persistence**: Repeating reminders every 30 seconds until acknowledged
 
 ## Data Flow
 
@@ -113,47 +114,20 @@ Preferred communication style: Simple, everyday language.
 
 The application follows a clean separation of concerns with shared schemas between frontend and backend, ensuring type safety across the full stack. The real-time logging system is designed for monitoring and notification purposes with both visual and audio feedback mechanisms.
 
-## Hybrid Mobile App Architecture
+## Mobile App Architecture
 
-### Intelligent Dual-Mode System
-- **Development Mode**: React Native 0.73 with full debugging capabilities
-- **Production/CI Mode**: Pure native Android WebView with JavaScript bridge
-- **Mode Detection**: Automatically switches based on CI environment variable
-- **Fallback Strategy**: Graceful degradation when React Native initialization fails
+### React Native Implementation
+- **Framework**: React Native 0.73 with TypeScript
+- **Navigation**: React Navigation v6 for screen management
+- **State Management**: TanStack Query for server state consistency
+- **Push Notifications**: React Native Push Notification for background alerts
+- **Audio System**: React Native Sound for native audio handling
+- **WebSocket**: Native WebSocket implementation with auto-reconnection
 
-### Native WebView Implementation
-- **WebView Engine**: Android WebKit with JavaScript enabled
-- **Bridge Interface**: Exposes native functions to web app via `window.NativeApp`
-- **Critical Alerts**: Native notification system with high priority and full-screen capability
-- **Audio System**: Android ToneGenerator for alarm-style sound alerts
-- **Permissions**: Native handling of notification and audio permissions
+### Deployment Options
+- **Development**: Metro bundler with hot reloading
+- **Production**: Native APK/IPA builds for distribution
+- **Distribution**: Direct APK sharing, TestFlight, or app store publication
+- **API Integration**: Connects to same Replit backend endpoints
 
-### CI-Optimized Build Process
-- **Dependency Exclusion**: Disables all React Native auto-linking in CI environment
-- **Clean Native Build**: Uses only stable Android dependencies (WebView, OkHttp, Gson)
-- **Library Removal**: Physically removes problematic React Native libraries during CI
-- **Environment Detection**: CI environment triggers pure native mode automatically
-
-### Deployment Strategy
-- **Development**: React Native with Metro bundler and hot reloading
-- **CI/Production**: Native Android APK builds without React Native dependencies
-- **Distribution**: Clean APK files suitable for direct installation or app store distribution
-- **Backend Integration**: Connects to same Replit backend via WebView HTTP requests
-
-This hybrid approach ensures 100% compatibility with CI build systems while maintaining development flexibility and providing native mobile capabilities for critical alert functionality.
-
-## Recent Critical Fixes (Jan 2025)
-
-### APK Installation Validity Issues RESOLVED
-- **Fixed missing PNG app icons**: Replaced XML vector drawables with proper PNG files for all screen densities
-- **Added APK signing configuration**: Integrated debug keystore for valid signed APK generation
-- **Resolved Gradle compilation errors**: Fixed duplicate `isCI` variable declarations causing build failures
-- **Enhanced resource structure**: Added network security config, notification icons, and complete Android themes
-- **Improved CI build process**: Added comprehensive APK validation with aapt tool verification
-- **All installation blockers removed**: APK now passes Android package validation and installs successfully
-
-### Build System Improvements
-- **Pure native CI builds**: No React Native dependencies in production APK generation
-- **Debug signing**: Uses Android debug keystore for installable unsigned APKs
-- **Resource validation**: All essential Android components verified before release
-- **Enhanced logging**: Detailed build output for troubleshooting APK issues
+The mobile app maintains 100% feature parity with the web version while providing native mobile capabilities like background notifications, better audio handling, and app store distribution.
