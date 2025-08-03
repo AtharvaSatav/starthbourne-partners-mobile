@@ -2,6 +2,8 @@
 
 🚨 **Real-time logging mobile app with critical alert system and 24/7 background monitoring**
 
+*Latest build: GitHub Actions auto-build enabled*
+
 ## Features
 
 ### 🔔 Critical Alert System
