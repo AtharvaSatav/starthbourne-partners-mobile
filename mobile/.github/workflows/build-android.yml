@@ -20,7 +20,7 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
-        cache-dependency-path: mobile/package-lock.json
+        cache-dependency-path: package-lock.json
         
     - name: Setup Java
       uses: actions/setup-java@v4
@@ -35,34 +35,33 @@ jobs:
       run: yes | sdkmanager --licenses || true
       
     - name: Install dependencies
-      working-directory: mobile
       run: |
         npm ci --prefer-offline --no-audit
         
     - name: Create gradle.properties
-      working-directory: mobile/android
+      working-directory: android
       run: |
         echo "org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=512m" >> gradle.properties
         echo "android.useAndroidX=true" >> gradle.properties
         echo "android.enableJetifier=true" >> gradle.properties
         
     - name: Make gradlew executable
-      working-directory: mobile/android
+      working-directory: android
       run: chmod +x gradlew
       
     - name: Clean project
-      working-directory: mobile/android
+      working-directory: android
       run: ./gradlew clean
       
     - name: Build APK
-      working-directory: mobile/android
+      working-directory: android
       run: ./gradlew assembleRelease --no-daemon --stacktrace
       
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
       with:
         name: starthbourne-partners-${{ github.sha }}
-        path: mobile/android/app/build/outputs/apk/release/app-release.apk
+        path: android/app/build/outputs/apk/release/app-release.apk
         retention-days: 30
         
     - name: Create release (if on main branch)
